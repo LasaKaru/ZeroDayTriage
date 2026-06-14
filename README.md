@@ -40,6 +40,27 @@ Active Directory live-hacking event.**
 
 The four operator loops the tool accelerates: **Enumerate → Identify path → Exploit → Loot & pivot.**
 
+## Full kill-chain coverage (the five EVIL CORP phases)
+
+Project ZeroDay is not just an AD privesc box — it models the whole EVIL CORP banking
+intrusion. ZeroDayTriage covers all five progressive phases, ingesting the right evidence and
+reasoning a response/exploitation path for each:
+
+| # | Phase | Evidence ingested | Rule output |
+| - | ----- | ----------------- | ----------- |
+| 1 | **Initial Intrusion & Recon** | Suricata IDS alerts (SocGholish / fake-update / drive-by) | scope patient zero, recover the dropped payload, pivot to its C2 |
+| 2 | **Command & Control Evasion** | RITA beacon analysis + Suricata C2 signatures | trace the encrypted channel, extract C2 infra as IOCs, scope every beaconing host |
+| 3 | **Privilege Escalation** | BloodHound, NetExec, Certipy | Kerberoast, AS-REP, ADCS ESC1–8, ACL chains, PtH, coerce-relay, **DCSync → golden ticket**, unconstrained delegation |
+| 4 | **Malware Triage** | malware config-extractor JSON (Dridex/ransomware) | recover crypto keys + C2, fuse into one decrypt-and-scope action; ransomware auto-detected |
+| 5 | **Data Exfiltration** | Suricata exfil alerts (bulk upload / DNS tunneling) | identify the targeted DB records, quantify and contain the channel |
+
+Every triage report prints a coverage line so you can see at a glance which phases have an
+actionable path:
+
+```
+kill-chain coverage: [x] 1.Initial  [x] 2.C2  [x] 3.PrivEsc  [x] 4.Malware  [x] 5.Exfil
+```
+
 ## Solution layout
 
 | Project | Responsibility |
@@ -87,6 +108,9 @@ dotnet run --project src/ZeroDayTriage.Cli -- triage --db /tmp/eng.db
 | SharpHound / BloodHound CE | collection JSON | Kerberoastable SPNs, AS-REP roastable, unconstrained delegation, dangerous ACEs (GenericAll/Write, WriteDacl/Owner, DCSync) |
 | NetExec (nxc) / CrackMapExec | console output | valid credentials, pass-the-hash + local admin, SMB signing posture |
 | Certipy | `find` JSON | AD CS template vulnerabilities ESC1–ESC8 |
+| Suricata | EVE NDJSON | IDS alerts classified into Initial Access / C2 / Exfiltration |
+| RITA | beacon-analysis JSON | encrypted C2 beaconing, scored by regularity |
+| Malware config extractor | JSON | family, extracted crypto keys, embedded C2, host IOCs; ransomware detection |
 | Slither | `--json` | Solidity defects mapped onto the severity scale |
 
 New tools are added by implementing `INormalizer`; new attack knowledge by implementing

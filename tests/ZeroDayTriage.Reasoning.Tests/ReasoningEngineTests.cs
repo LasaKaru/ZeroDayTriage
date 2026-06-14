@@ -96,7 +96,36 @@ public sealed class ReasoningEngineTests
     public void CreateDefault_wires_the_full_rule_set()
     {
         ReasoningEngine.CreateDefault().Rules.Select(r => r.Id)
-            .Should().Contain(new[] { "AD-KERBEROAST", "AD-ADCS", "AD-ACL", "AD-PTH", "CHAIN-SOLIDITY" });
+            .Should().Contain(new[]
+            {
+                "EC-INITIAL-ACCESS", "EC-C2", "AD-KERBEROAST", "AD-ADCS", "AD-ACL", "AD-PTH",
+                "AD-DCSYNC", "AD-UNCONSTRAINED", "EC-MALWARE", "EC-EXFIL", "CHAIN-SOLIDITY",
+            });
+    }
+
+    [Fact]
+    public void Triage_reports_all_five_kill_chain_phases_when_present()
+    {
+        var engine = ReasoningEngine.CreateDefault();
+
+        var report = engine.Triage(new[]
+        {
+            Finding("SocGholish", "10.0.0.1", AssetDomain.Network,
+                properties: new Dictionary<string, string> { ["src_ip"] = "10.0.0.1" }, tags: "initial-access"),
+            Finding("beacon", "10.0.0.1", AssetDomain.Network,
+                properties: new Dictionary<string, string> { ["source"] = "10.0.0.1", ["destination"] = "1.2.3.4" }, tags: "c2-beacon"),
+            Finding("dcsync", "svc", technique: "T1003.006", severity: Severity.Critical, tags: "dcsync"),
+            Finding("Dridex", "hash", AssetDomain.Endpoint,
+                properties: new Dictionary<string, string> { ["family"] = "Dridex" }, tags: new[] { "malware", "triage" }),
+            Finding("exfil", "10.0.0.9", AssetDomain.Network,
+                properties: new Dictionary<string, string> { ["src_ip"] = "10.0.0.9" }, tags: "exfiltration"),
+        });
+
+        report.PhasesCovered.Should().BeEquivalentTo(new[]
+        {
+            MissionPhase.InitialAccess, MissionPhase.CommandAndControl, MissionPhase.PrivilegeEscalation,
+            MissionPhase.MalwareTriage, MissionPhase.DataExfiltration,
+        });
     }
 
     private sealed class ThrowingRule : IAttackPathRule

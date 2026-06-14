@@ -20,6 +20,9 @@ public sealed record Finding
     /// <summary>Which battleground this belongs to.</summary>
     public AssetDomain Domain { get; init; } = AssetDomain.Unknown;
 
+    /// <summary>Which EVIL CORP kill-chain phase this clue belongs to, when known.</summary>
+    public MissionPhase? Phase { get; init; }
+
     public Severity Severity { get; init; } = Severity.Info;
 
     public Confidence Confidence { get; init; } = Confidence.Suspected;

@@ -24,6 +24,9 @@ public sealed class NormalizerRegistry
         new NetExecNormalizer(),
         new CertipyNormalizer(),
         new SlitherNormalizer(),
+        new SuricataNormalizer(),
+        new BeaconAnalysisNormalizer(),
+        new MalwareConfigNormalizer(),
     });
 
     public IReadOnlyList<INormalizer> Normalizers => _normalizers;

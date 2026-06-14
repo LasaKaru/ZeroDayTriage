@@ -100,6 +100,95 @@ public static class SampleData
             Properties = new Dictionary<string, string> { ["check"] = "reentrancy-eth", ["impact"] = "High" },
         }.WithComputedId(),
 
+        // --- Phase 1: Initial Access (SocGholish fake-update dropper) ---
+        new Finding
+        {
+            Title = "ET MALWARE SocGholish Fake Browser Update",
+            Domain = AssetDomain.Network,
+            Phase = MissionPhase.InitialAccess,
+            Severity = Severity.Critical,
+            Confidence = Confidence.Probable,
+            Source = "suricata",
+            Principal = "10.20.1.44",
+            Technique = "T1189",
+            Tags = new[] { "initial-access", "ids", "network" },
+            Properties = new Dictionary<string, string> { ["src_ip"] = "10.20.1.44", ["dest_ip"] = "185.99.4.10" },
+        }.WithComputedId(),
+
+        // --- Phase 2: Command & Control (RITA beacon) ---
+        new Finding
+        {
+            Title = "C2 beacon 10.20.1.44 -> 185.99.4.10 (score 0.97)",
+            Domain = AssetDomain.Network,
+            Phase = MissionPhase.CommandAndControl,
+            Severity = Severity.Critical,
+            Confidence = Confidence.Confirmed,
+            Source = "rita",
+            Principal = "10.20.1.44",
+            Technique = "T1071.001",
+            Tags = new[] { "c2-beacon", "network", "high-confidence" },
+            Properties = new Dictionary<string, string>
+            {
+                ["score"] = "0.970", ["source"] = "10.20.1.44", ["destination"] = "185.99.4.10",
+            },
+        }.WithComputedId(),
+
+        // --- Phase 4: Malware Triage (Dridex config: keys + C2) ---
+        new Finding
+        {
+            Title = "Banking trojan triaged: Dridex",
+            Domain = AssetDomain.Endpoint,
+            Phase = MissionPhase.MalwareTriage,
+            Severity = Severity.Critical,
+            Confidence = Confidence.Confirmed,
+            Source = "malware-config",
+            Principal = "e3b0c44298fc1c149afbf4c8996fb924",
+            Technique = "T1005",
+            Tags = new[] { "malware", "banking-trojan", "triage" },
+            Properties = new Dictionary<string, string> { ["family"] = "Dridex" },
+        }.WithComputedId(),
+        new Finding
+        {
+            Title = "Extracted rc4 key from Dridex",
+            Domain = AssetDomain.Endpoint,
+            Phase = MissionPhase.MalwareTriage,
+            Severity = Severity.High,
+            Confidence = Confidence.Confirmed,
+            Source = "malware-config",
+            Principal = "Dridex",
+            Technique = "T1005",
+            Tags = new[] { "crypto-key", "ioc", "malware" },
+            Properties = new Dictionary<string, string> { ["keyType"] = "rc4", ["family"] = "Dridex" },
+        }.WithComputedId(),
+        new Finding
+        {
+            Title = "C2 infrastructure for Dridex: 185.99.4.10:443",
+            Domain = AssetDomain.Network,
+            Phase = MissionPhase.CommandAndControl,
+            Severity = Severity.High,
+            Confidence = Confidence.Confirmed,
+            Source = "malware-config",
+            Principal = "185.99.4.10:443",
+            Technique = "T1071",
+            Tags = new[] { "c2-infra", "ioc", "network", "malware" },
+            Properties = new Dictionary<string, string> { ["family"] = "Dridex", ["endpoint"] = "185.99.4.10:443" },
+        }.WithComputedId(),
+
+        // --- Phase 5: Data Exfiltration ---
+        new Finding
+        {
+            Title = "ET POLICY Large Outbound Transfer to External Host",
+            Domain = AssetDomain.Network,
+            Phase = MissionPhase.DataExfiltration,
+            Severity = Severity.Critical,
+            Confidence = Confidence.Probable,
+            Source = "suricata",
+            Principal = "10.20.5.9",
+            Technique = "T1041",
+            Tags = new[] { "exfiltration", "ids", "network" },
+            Properties = new Dictionary<string, string> { ["src_ip"] = "10.20.5.9", ["dest_ip"] = "185.99.4.10" },
+        }.WithComputedId(),
+
         // Deliberate low-value noise to prove the engine filters it.
         new Finding
         {

@@ -87,6 +87,47 @@ internal static class Fixtures
         }
         """;
 
+    public const string SuricataEve =
+        """
+        {"timestamp":"2026-06-14T10:00:01Z","event_type":"alert","src_ip":"10.20.1.44","dest_ip":"185.99.4.10","alert":{"signature":"ET MALWARE SocGholish Fake Browser Update","category":"A Network Trojan was detected","severity":1}}
+        {"timestamp":"2026-06-14T10:05:11Z","event_type":"alert","src_ip":"10.20.1.44","dest_ip":"185.99.4.10","alert":{"signature":"ET MALWARE Cobalt Strike Beacon Observed","category":"Malware","severity":1}}
+        {"timestamp":"2026-06-14T11:30:00Z","event_type":"alert","src_ip":"10.20.5.9","dest_ip":"185.99.4.10","alert":{"signature":"ET POLICY Large Outbound Data Exfiltration","category":"Policy","severity":2}}
+        {"timestamp":"2026-06-14T11:31:00Z","event_type":"flow","src_ip":"10.20.5.9","dest_ip":"8.8.8.8"}
+        """;
+
+    public const string RitaBeacons =
+        """
+        {
+          "beacons": [
+            { "source": "10.20.1.44", "destination": "185.99.4.10", "score": 0.97, "connections": 1440 },
+            { "source": "10.20.2.7", "destination": "9.9.9.9", "score": 0.42, "connections": 18 }
+          ]
+        }
+        """;
+
+    public const string MalwareConfig =
+        """
+        {
+          "family": "Dridex",
+          "sample_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "c2": ["185.99.4.10:443", "91.213.50.12:8443"],
+          "keys": { "rc4": "8f3ab2c1d4e5f60718293a4b5c6d7e8f", "botnet_id": "22201" },
+          "capabilities": ["inject into process", "encrypt C2 using RC4", "steal banking credentials"],
+          "iocs": { "mutex": "Global\\\\A1B2C3", "registry": "HKCU\\\\Software\\\\Dridex" }
+        }
+        """;
+
+    public const string RansomwareConfig =
+        """
+        {
+          "family": "EvilLocker",
+          "sample_sha256": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+          "c2": ["10.66.6.6:1337"],
+          "keys": { "rsa_pub": "MFwwDQYJ..." },
+          "capabilities": ["encrypt files", "delete shadow copies"]
+        }
+        """;
+
     public const string Slither =
         """
         {

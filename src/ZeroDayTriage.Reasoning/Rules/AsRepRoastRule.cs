@@ -29,6 +29,7 @@ public sealed class AsRepRoastRule : IAttackPathRule
                 Name = $"AS-REP roast {f.Principal}",
                 Objective = "Initial credential access",
                 Domain = AssetDomain.ActiveDirectory,
+                Phase = MissionPhase.InitialAccess,
                 Impact = Severity.High,
                 Confidence = f.Confidence,
                 Rationale =

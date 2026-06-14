@@ -1,0 +1,6 @@
+{
+  "beacons": [
+    { "source": "10.20.1.44", "destination": "185.99.4.10", "score": 0.97, "connections": 1440, "avg_bytes": 512 },
+    { "source": "10.20.2.7", "destination": "9.9.9.9", "score": 0.42, "connections": 18, "avg_bytes": 1200 }
+  ]
+}

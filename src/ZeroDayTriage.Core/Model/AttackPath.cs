@@ -31,6 +31,9 @@ public sealed record AttackPath
 
     public AssetDomain Domain { get; init; } = AssetDomain.ActiveDirectory;
 
+    /// <summary>The EVIL CORP kill-chain phase this path advances.</summary>
+    public MissionPhase Phase { get; init; } = MissionPhase.PrivilegeEscalation;
+
     public Severity Impact { get; init; } = Severity.High;
 
     public Confidence Confidence { get; init; } = Confidence.Probable;

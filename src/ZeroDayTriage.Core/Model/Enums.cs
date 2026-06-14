@@ -13,6 +13,35 @@ public enum AssetDomain
     Windows,
     Kubernetes,
     SmartContract,
+
+    /// <summary>Wire-level evidence: IDS alerts, C2 beaconing, exfiltration flows.</summary>
+    Network,
+
+    /// <summary>Host/endpoint artifacts: initial-access droppers, malware samples, configs.</summary>
+    Endpoint,
+}
+
+/// <summary>
+/// The five progressive phases of the EVIL CORP banking intrusion the event is modeled on.
+/// Mapping findings and paths to a phase lets the operator see kill-chain coverage at a glance
+/// and tells the investigator which part of the story a clue belongs to.
+/// </summary>
+public enum MissionPhase
+{
+    /// <summary>Weaponized "update" droppers (SocGholish), drive-by, phishing — the foothold.</summary>
+    InitialAccess = 0,
+
+    /// <summary>Encrypted C2 beaconing, Cobalt Strike / Dridex traffic, evasion.</summary>
+    CommandAndControl = 1,
+
+    /// <summary>Workstation -> Domain Controller pivot inside Active Directory.</summary>
+    PrivilegeEscalation = 2,
+
+    /// <summary>Reverse-engineering trojans/ransomware: config, crypto keys, IOCs.</summary>
+    MalwareTriage = 3,
+
+    /// <summary>Locating and draining the targeted databases / financial records.</summary>
+    DataExfiltration = 4,
 }
 
 /// <summary>

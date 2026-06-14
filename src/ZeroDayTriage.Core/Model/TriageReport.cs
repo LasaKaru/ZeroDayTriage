@@ -24,4 +24,11 @@ public sealed record TriageReport
 
     public IReadOnlyDictionary<AssetDomain, int> FindingsByDomain { get; init; }
         = new Dictionary<AssetDomain, int>();
+
+    /// <summary>Count of ranked attack paths in each EVIL CORP kill-chain phase.</summary>
+    public IReadOnlyDictionary<MissionPhase, int> PathsByPhase { get; init; }
+        = new Dictionary<MissionPhase, int>();
+
+    /// <summary>The kill-chain phases for which at least one attack path was derived.</summary>
+    public IReadOnlyList<MissionPhase> PhasesCovered { get; init; } = Array.Empty<MissionPhase>();
 }

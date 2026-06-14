@@ -25,12 +25,24 @@ public sealed class ReasoningEngine
     /// <summary>Engine wired with the full built-in rule set.</summary>
     public static ReasoningEngine CreateDefault() => new(new IAttackPathRule[]
     {
-        new KerberoastingRule(),
+        // Phase 1 — Initial Access
+        new InitialAccessRule(),
         new AsRepRoastRule(),
+        // Phase 2 — Command & Control
+        new C2DetectionRule(),
+        // Phase 3 — Privilege Escalation
+        new KerberoastingRule(),
         new AdcsEscalationRule(),
         new AclEscalationRule(),
         new PassTheHashRule(),
         new CoercionRelayRule(),
+        new DcSyncRule(),
+        new UnconstrainedDelegationRule(),
+        // Phase 4 — Malware Triage
+        new MalwareTriageRule(),
+        // Phase 5 — Data Exfiltration
+        new ExfiltrationRule(),
+        // Bonus battleground — smart contracts
         new SmartContractRule(),
     });
 
@@ -81,12 +93,22 @@ public sealed class ReasoningEngine
             .GroupBy(f => f.Domain)
             .ToDictionary(g => g.Key, g => g.Count());
 
+        var byPhase = ranked
+            .GroupBy(p => p.Phase)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var phasesCovered = byPhase.Keys
+            .OrderBy(p => (int)p)
+            .ToList();
+
         return new TriageReport
         {
             FindingsConsidered = corpus.Count,
             Paths = ranked,
             SuppressedAsNoise = noise,
             FindingsByDomain = byDomain,
+            PathsByPhase = byPhase,
+            PhasesCovered = phasesCovered,
         };
     }
 

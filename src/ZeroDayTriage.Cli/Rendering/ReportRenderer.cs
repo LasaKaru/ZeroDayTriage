@@ -37,6 +37,8 @@ public static class ReportRenderer
         sb.AppendLine("  PROJECT ZERODAY 2026 — TRIAGE REPORT");
         sb.AppendLine($"  generated {report.GeneratedAt:u}  |  {report.FindingsConsidered} findings considered");
         sb.AppendLine("==================================================================");
+        sb.AppendLine($"  kill-chain coverage: {RenderCoverage(report)}");
+        sb.AppendLine("==================================================================");
         sb.AppendLine();
 
         if (report.TopPath is { } top1)
@@ -83,6 +85,29 @@ public static class ReportRenderer
         return sb.ToString();
     }
 
+    private static readonly MissionPhase[] AllPhases =
+    {
+        MissionPhase.InitialAccess, MissionPhase.CommandAndControl, MissionPhase.PrivilegeEscalation,
+        MissionPhase.MalwareTriage, MissionPhase.DataExfiltration,
+    };
+
+    private static string RenderCoverage(TriageReport report)
+    {
+        var covered = report.PhasesCovered.ToHashSet();
+        var parts = AllPhases.Select(p => covered.Contains(p) ? $"[x] {Abbrev(p)}" : $"[ ] {Abbrev(p)}");
+        return string.Join("  ", parts);
+    }
+
+    private static string Abbrev(MissionPhase phase) => phase switch
+    {
+        MissionPhase.InitialAccess => "1.Initial",
+        MissionPhase.CommandAndControl => "2.C2",
+        MissionPhase.PrivilegeEscalation => "3.PrivEsc",
+        MissionPhase.MalwareTriage => "4.Malware",
+        MissionPhase.DataExfiltration => "5.Exfil",
+        _ => phase.ToString(),
+    };
+
     private static string RenderMarkdown(TriageReport report, int top)
     {
         var sb = new StringBuilder();
@@ -110,6 +135,19 @@ public static class ReportRenderer
 
             sb.AppendLine();
         }
+
+        sb.AppendLine("## Kill-chain phase coverage");
+        sb.AppendLine();
+        sb.AppendLine("| Phase | Covered | Paths |");
+        sb.AppendLine("| ----- | :-----: | ----: |");
+        var covered = report.PhasesCovered.ToHashSet();
+        foreach (var phase in AllPhases)
+        {
+            report.PathsByPhase.TryGetValue(phase, out var count);
+            sb.AppendLine($"| {Abbrev(phase)} | {(covered.Contains(phase) ? "✅" : "—")} | {count} |");
+        }
+
+        sb.AppendLine();
 
         sb.AppendLine("## Prioritized attack paths");
         sb.AppendLine();

@@ -39,7 +39,10 @@ public sealed class NormalizerRegistryTests
     public void CreateDefault_registers_every_builtin_normalizer()
     {
         _sut.Normalizers.Select(n => n.Source)
-            .Should().BeEquivalentTo(new[] { "sharphound", "netexec", "certipy", "slither" });
+            .Should().BeEquivalentTo(new[]
+            {
+                "sharphound", "netexec", "certipy", "slither", "suricata", "rita", "malware-config",
+            });
     }
 
     private static string LookupFixture(string name) => name switch
