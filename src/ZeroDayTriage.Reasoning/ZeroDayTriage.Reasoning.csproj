@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ZeroDayTriage.Reasoning</RootNamespace>
+    <AssemblyName>ZeroDayTriage.Reasoning</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZeroDayTriage.Core\ZeroDayTriage.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,29 @@
+{
+  "success": true,
+  "error": null,
+  "results": {
+    "detectors": [
+      {
+        "check": "reentrancy-eth",
+        "impact": "High",
+        "confidence": "Medium",
+        "description": "Reentrancy in VaultBank.withdraw() (contracts/VaultBank.sol#42-58): external call before state update.",
+        "elements": [ { "type": "function", "name": "VaultBank.withdraw()" } ]
+      },
+      {
+        "check": "arbitrary-send-eth",
+        "impact": "High",
+        "confidence": "High",
+        "description": "VaultBank.sweep(address) sends eth to an arbitrary user.",
+        "elements": [ { "type": "function", "name": "VaultBank.sweep(address)" } ]
+      },
+      {
+        "check": "naming-convention",
+        "impact": "Informational",
+        "confidence": "High",
+        "description": "Variable VaultBank._Owner is not in mixedCase.",
+        "elements": [ { "type": "variable", "name": "VaultBank._Owner" } ]
+      }
+    ]
+  }
+}

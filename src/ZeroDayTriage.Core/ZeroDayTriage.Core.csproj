@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ZeroDayTriage.Core</RootNamespace>
+    <AssemblyName>ZeroDayTriage.Core</AssemblyName>
+  </PropertyGroup>
+
+</Project>

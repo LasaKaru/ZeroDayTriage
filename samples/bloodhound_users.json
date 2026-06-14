@@ -1,0 +1,31 @@
+{
+  "meta": { "type": "users", "count": 2, "version": 5 },
+  "data": [
+    {
+      "ObjectIdentifier": "S-1-5-21-3623811015-3361044348-30300820-1104",
+      "Properties": {
+        "name": "SVC_SQL@EVILCORP.LOCAL",
+        "samaccountname": "SVC_SQL",
+        "enabled": true,
+        "hasspn": true,
+        "serviceprincipalnames": ["MSSQLSvc/db01.evilcorp.local:1433"],
+        "dontreqpreauth": false,
+        "unconstraineddelegation": false
+      },
+      "Aces": [
+        { "PrincipalSID": "S-1-5-21-3623811015-3361044348-30300820-1104", "PrincipalName": "SVC_SQL", "RightName": "GenericWrite" }
+      ]
+    },
+    {
+      "ObjectIdentifier": "S-1-5-21-3623811015-3361044348-30300820-1105",
+      "Properties": {
+        "name": "AUDIT_SVC@EVILCORP.LOCAL",
+        "samaccountname": "AUDIT_SVC",
+        "enabled": true,
+        "hasspn": false,
+        "dontreqpreauth": true
+      },
+      "Aces": []
+    }
+  ]
+}

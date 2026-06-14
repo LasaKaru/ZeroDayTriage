@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ZeroDayTriage.Tools</RootNamespace>
+    <AssemblyName>ZeroDayTriage.Tools</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZeroDayTriage.Core\ZeroDayTriage.Core.csproj" />
+  </ItemGroup>
+
+</Project>

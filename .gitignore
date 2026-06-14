@@ -1,0 +1,37 @@
+# .NET build artifacts
+bin/
+obj/
+out/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+
+# Test results
+[Tt]est[Rr]esults/
+coverage*.json
+coverage*.xml
+coverage*.cobertura.xml
+*.trx
+
+# Local triage databases & engagement loot (never commit operational data)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+loot/
+engagements/
+samples/private/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tooling
+.dotnet/
+*.nupkg

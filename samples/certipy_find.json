@@ -1,0 +1,18 @@
+{
+  "Certificate Authorities": {},
+  "Certificate Templates": {
+    "0": {
+      "Template Name": "BankUserAuth",
+      "Enabled": true,
+      "Client Authentication": true,
+      "Enrollee Supplies Subject": true,
+      "[!] Vulnerabilities": {
+        "ESC1": "'EVILCORP.LOCAL\\\\Domain Users' can enroll, enrollee supplies subject and template allows client authentication."
+      }
+    },
+    "1": {
+      "Template Name": "WebServer",
+      "Enabled": true
+    }
+  }
+}

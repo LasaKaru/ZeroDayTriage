@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ZeroDayTriage.Storage</RootNamespace>
+    <AssemblyName>ZeroDayTriage.Storage</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZeroDayTriage.Core\ZeroDayTriage.Core.csproj" />
+  </ItemGroup>
+
+</Project>
