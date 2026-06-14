@@ -38,6 +38,8 @@ public sealed class ReasoningEngine
         new CoercionRelayRule(),
         new DcSyncRule(),
         new UnconstrainedDelegationRule(),
+        new LateralMovementRule(),
+        new ShortestPathToDomainAdminRule(),
         // Phase 4 — Malware Triage
         new MalwareTriageRule(),
         // Phase 5 — Data Exfiltration

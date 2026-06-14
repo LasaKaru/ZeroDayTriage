@@ -70,6 +70,8 @@ public sealed class BloodHoundNormalizer : INormalizer
 
                 ExtractAccountPrimitives(node, name, findings);
                 ExtractAces(node, name, findings);
+                ExtractGraphEdges(node, name, findings);
+                FlagHighValue(node, name, findings);
             }
         }
 
@@ -173,6 +175,154 @@ public sealed class BloodHoundNormalizer : INormalizer
                 },
                 Evidence = $"{principal} --{right}--> {name}",
             });
+        }
+    }
+
+    /// <summary>
+    /// Emits the BloodHound graph edges the path-finder consumes: group membership, local-admin,
+    /// RDP/PSRemote/DCOM access, and active sessions. Every edge finding carries the source as
+    /// <see cref="Finding.Principal"/> and the target in the "target" property, with an "edge" tag.
+    /// </summary>
+    private void ExtractGraphEdges(JsonElement node, string name, List<Finding> findings)
+    {
+        // Group node: each member -> this group (MemberOf).
+        foreach (var member in ReadIdentifiers(node, "Members"))
+        {
+            findings.Add(EdgeFinding("memberof", member, name, Severity.Low,
+                $"{member} is a member of {name}", "T1078"));
+        }
+
+        // Computer node edges. Direction encodes "controlling source lets you control target".
+        foreach (var admin in ReadIdentifiers(node, "LocalAdmins"))
+        {
+            findings.Add(EdgeFinding("adminto", admin, name, Severity.High,
+                $"{admin} is local admin on {name}", "T1078.002"));
+        }
+
+        foreach (var rdp in ReadIdentifiers(node, "RemoteDesktopUsers"))
+        {
+            findings.Add(EdgeFinding("canrdp", rdp, name, Severity.Medium,
+                $"{rdp} can RDP to {name}", "T1021.001"));
+        }
+
+        foreach (var ps in ReadIdentifiers(node, "PSRemoteUsers"))
+        {
+            findings.Add(EdgeFinding("canpsremote", ps, name, Severity.Medium,
+                $"{ps} can PSRemote to {name}", "T1021.006"));
+        }
+
+        foreach (var dcom in ReadIdentifiers(node, "DcomUsers"))
+        {
+            findings.Add(EdgeFinding("executedcom", dcom, name, Severity.Medium,
+                $"{dcom} can ExecuteDCOM on {name}", "T1021.003"));
+        }
+
+        // Sessions: controlling the computer lets you steal the session user's credentials.
+        foreach (var user in ReadSessionUsers(node))
+        {
+            findings.Add(EdgeFinding("hassession", name, user, Severity.Medium,
+                $"{user} has a session on {name}", "T1003"));
+        }
+    }
+
+    private Finding EdgeFinding(string edge, string source, string target, Severity severity, string evidence, string technique) =>
+        new Finding
+        {
+            Title = $"{edge}: {source} -> {target}",
+            Domain = AssetDomain.ActiveDirectory,
+            Severity = severity,
+            Confidence = Confidence.Confirmed,
+            Source = Source,
+            Principal = source,
+            Technique = technique,
+            Tags = new[] { edge, "graph-edge", "ad" },
+            Properties = new Dictionary<string, string> { ["target"] = target, ["edge"] = edge },
+            Evidence = evidence,
+        };
+
+    private void FlagHighValue(JsonElement node, string name, List<Finding> findings)
+    {
+        if (node.TryGetProperty("Properties", out var props) &&
+            TryGetBool(props, "highvalue", out var hv) && hv)
+        {
+            findings.Add(new Finding
+            {
+                Title = $"High-value target: {name}",
+                Domain = AssetDomain.ActiveDirectory,
+                Severity = Severity.Info,
+                Confidence = Confidence.Confirmed,
+                Source = Source,
+                Principal = name,
+                Tags = new[] { "highvalue", "ad" },
+                Properties = new Dictionary<string, string> { ["target"] = name },
+            });
+        }
+    }
+
+    /// <summary>
+    /// Reads a BloodHound edge array (Members, LocalAdmins, ...). Entries may be plain strings,
+    /// or objects carrying ObjectIdentifier / name. Identity resolution prefers a readable name.
+    /// </summary>
+    private static IEnumerable<string> ReadIdentifiers(JsonElement node, string property)
+    {
+        if (!node.TryGetProperty(property, out var array) || array.ValueKind != JsonValueKind.Array)
+        {
+            yield break;
+        }
+
+        foreach (var entry in array.EnumerateArray())
+        {
+            var id = entry.ValueKind switch
+            {
+                JsonValueKind.String => entry.GetString(),
+                JsonValueKind.Object => GetString(entry, "name")
+                    ?? GetString(entry, "ObjectIdentifier")
+                    ?? GetString(entry, "MemberId"),
+                _ => null,
+            };
+
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                yield return id!;
+            }
+        }
+    }
+
+    private static IEnumerable<string> ReadSessionUsers(JsonElement node)
+    {
+        // Sessions can appear as a bare array or wrapped as { "Results": [...] }.
+        if (!node.TryGetProperty("Sessions", out var sessions))
+        {
+            yield break;
+        }
+
+        var array = sessions;
+        if (sessions.ValueKind == JsonValueKind.Object &&
+            sessions.TryGetProperty("Results", out var results))
+        {
+            array = results;
+        }
+
+        if (array.ValueKind != JsonValueKind.Array)
+        {
+            yield break;
+        }
+
+        foreach (var entry in array.EnumerateArray())
+        {
+            var user = entry.ValueKind switch
+            {
+                JsonValueKind.String => entry.GetString(),
+                JsonValueKind.Object => GetString(entry, "UserName")
+                    ?? GetString(entry, "UserSID")
+                    ?? GetString(entry, "user"),
+                _ => null,
+            };
+
+            if (!string.IsNullOrWhiteSpace(user))
+            {
+                yield return user!;
+            }
         }
     }
 

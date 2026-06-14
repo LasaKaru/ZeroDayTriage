@@ -100,6 +100,56 @@ public static class SampleData
             Properties = new Dictionary<string, string> { ["check"] = "reentrancy-eth", ["impact"] = "High" },
         }.WithComputedId(),
 
+        // --- BloodHound graph chain: jdoe -> WS01 -> svc_adm -> Domain Admins ---
+        new Finding
+        {
+            Title = "Valid credentials for EVILCORP\\jdoe",
+            Domain = AssetDomain.ActiveDirectory,
+            Severity = Severity.High,
+            Confidence = Confidence.Confirmed,
+            Source = "netexec",
+            Principal = "EVILCORP\\jdoe",
+            Technique = "T1078.002",
+            Tags = new[] { "valid-credential", "ad" },
+            Properties = new Dictionary<string, string> { ["host"] = "WS01" },
+        }.WithComputedId(),
+        new Finding
+        {
+            Title = "adminto: EVILCORP\\jdoe -> WS01",
+            Domain = AssetDomain.ActiveDirectory,
+            Severity = Severity.High,
+            Confidence = Confidence.Confirmed,
+            Source = "sharphound",
+            Principal = "EVILCORP\\jdoe",
+            Technique = "T1078.002",
+            Tags = new[] { "adminto", "graph-edge", "ad" },
+            Properties = new Dictionary<string, string> { ["target"] = "WS01", ["edge"] = "adminto" },
+        }.WithComputedId(),
+        new Finding
+        {
+            Title = "hassession: WS01 -> EVILCORP\\svc_adm",
+            Domain = AssetDomain.ActiveDirectory,
+            Severity = Severity.Medium,
+            Confidence = Confidence.Confirmed,
+            Source = "sharphound",
+            Principal = "WS01",
+            Technique = "T1003",
+            Tags = new[] { "hassession", "graph-edge", "ad" },
+            Properties = new Dictionary<string, string> { ["target"] = "EVILCORP\\svc_adm", ["edge"] = "hassession" },
+        }.WithComputedId(),
+        new Finding
+        {
+            Title = "memberof: EVILCORP\\svc_adm -> Domain Admins",
+            Domain = AssetDomain.ActiveDirectory,
+            Severity = Severity.Low,
+            Confidence = Confidence.Confirmed,
+            Source = "sharphound",
+            Principal = "EVILCORP\\svc_adm",
+            Technique = "T1078",
+            Tags = new[] { "memberof", "graph-edge", "ad" },
+            Properties = new Dictionary<string, string> { ["target"] = "Domain Admins", ["edge"] = "memberof" },
+        }.WithComputedId(),
+
         // --- Phase 1: Initial Access (SocGholish fake-update dropper) ---
         new Finding
         {

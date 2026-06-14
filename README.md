@@ -50,7 +50,7 @@ reasoning a response/exploitation path for each:
 | - | ----- | ----------------- | ----------- |
 | 1 | **Initial Intrusion & Recon** | Suricata IDS alerts (SocGholish / fake-update / drive-by) | scope patient zero, recover the dropped payload, pivot to its C2 |
 | 2 | **Command & Control Evasion** | RITA beacon analysis + Suricata C2 signatures | trace the encrypted channel, extract C2 infra as IOCs, scope every beaconing host |
-| 3 | **Privilege Escalation** | BloodHound, NetExec, Certipy | Kerberoast, AS-REP, ADCS ESC1–8, ACL chains, PtH, coerce-relay, **DCSync → golden ticket**, unconstrained delegation |
+| 3 | **Privilege Escalation & Lateral Movement** | BloodHound graph (membership/AdminTo/sessions/RDP/PSRemote), NetExec, Certipy | Kerberoast, AS-REP, ADCS ESC1–8, ACL chains, PtH, coerce-relay, **DCSync → golden ticket**, unconstrained delegation, **graph shortest-path to Domain Admin**, lateral movement |
 | 4 | **Malware Triage** | malware config-extractor JSON (Dridex/ransomware) | recover crypto keys + C2, fuse into one decrypt-and-scope action; ransomware auto-detected |
 | 5 | **Data Exfiltration** | Suricata exfil alerts (bulk upload / DNS tunneling) | identify the targeted DB records, quantify and contain the channel |
 
@@ -105,7 +105,7 @@ dotnet run --project src/ZeroDayTriage.Cli -- triage --db /tmp/eng.db
 
 | Tool | Format | Findings extracted |
 | ---- | ------ | ------------------ |
-| SharpHound / BloodHound CE | collection JSON | Kerberoastable SPNs, AS-REP roastable, unconstrained delegation, dangerous ACEs (GenericAll/Write, WriteDacl/Owner, DCSync) |
+| SharpHound / BloodHound CE | collection JSON | Kerberoastable SPNs, AS-REP roastable, unconstrained delegation, dangerous ACEs (GenericAll/Write, WriteDacl/Owner, DCSync), **and graph edges**: group membership, AdminTo, HasSession, CanRDP/PSRemote/DCOM, high-value flags |
 | NetExec (nxc) / CrackMapExec | console output | valid credentials, pass-the-hash + local admin, SMB signing posture |
 | Certipy | `find` JSON | AD CS template vulnerabilities ESC1–ESC8 |
 | Suricata | EVE NDJSON | IDS alerts classified into Initial Access / C2 / Exfiltration |
@@ -115,6 +115,24 @@ dotnet run --project src/ZeroDayTriage.Cli -- triage --db /tmp/eng.db
 
 New tools are added by implementing `INormalizer`; new attack knowledge by implementing
 `IAttackPathRule`. The engine discovers both through their registries.
+
+### BloodHound enumeration & shortest path to Domain Admin
+
+The BloodHound normalizer emits graph **edges** (group membership, AdminTo, HasSession,
+CanRDP / CanPSRemote / ExecuteDCOM) alongside account primitives. `ShortestPathToDomainAdminRule`
+loads them into an in-memory `AttackGraph` and runs **Dijkstra** from every owned foothold
+(cracked/valid credentials) to the nearest high-value target (Domain Admins, or any
+DCSync-capable principal), encoding each edge's real-world difficulty as its traversal cost.
+The result is the classic BloodHound answer — *the shortest route to Domain Admin* — rendered as
+a concrete, tool-by-tool plan:
+
+```
+Shortest path to domain admins: jdoe -> domain admins (3 hop(s))
+  jdoe -> [adminto] ws01 -> [hassession] svc_adm -> [memberof] domain admins
+    1. Use jdoe's local-admin rights on ws01 to execute and dump credentials.
+    2. Dump the logged-on session of svc_adm from ws01's memory.
+    3. Inherit Domain Admins through svc_adm's membership.
+```
 
 ## How the reasoning works
 

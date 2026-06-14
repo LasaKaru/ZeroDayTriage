@@ -59,6 +59,38 @@ internal static class Fixtures
         }
         """;
 
+    public const string BloodHoundGroups =
+        """
+        {
+          "meta": { "type": "groups", "count": 1 },
+          "data": [
+            {
+              "Properties": { "name": "DOMAIN ADMINS@EVILCORP.LOCAL", "highvalue": true },
+              "Members": [
+                { "ObjectIdentifier": "S-1-5-21-1", "name": "SVC_ADM@EVILCORP.LOCAL", "ObjectType": "User" }
+              ],
+              "Aces": []
+            }
+          ]
+        }
+        """;
+
+    public const string BloodHoundComputersGraph =
+        """
+        {
+          "meta": { "type": "computers", "count": 1 },
+          "data": [
+            {
+              "Properties": { "name": "WS01.EVILCORP.LOCAL" },
+              "LocalAdmins": [ { "name": "JDOE@EVILCORP.LOCAL", "ObjectType": "User" } ],
+              "RemoteDesktopUsers": [ { "name": "HELPDESK@EVILCORP.LOCAL", "ObjectType": "User" } ],
+              "Sessions": { "Results": [ { "UserName": "SVC_ADM@EVILCORP.LOCAL" } ] },
+              "Aces": []
+            }
+          ]
+        }
+        """;
+
     public const string NetExec =
         """
         SMB         10.10.0.5    445    DC01    [*] Windows Server 2022 (signing:False) (SMBv1:False)
