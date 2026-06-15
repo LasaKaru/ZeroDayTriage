@@ -97,10 +97,49 @@ The libraries (`Core`, `Tools`, `Reasoning`, `Storage`) are meant to be *referen
 only the CLI is an executable. From the command line none of this matters; just target the CLI
 project as shown below.
 
-## Usage
+## Live engagement vs. demo
+
+There are two ways to feed the engine, and it matters which you use during the event:
+
+- **`demo`** runs the built-in EVIL CORP *sample* scenario. It is canned data for learning the
+  tool — it will always say "BankUserAuth / jdoe". **Do not** use it to find real answers.
+- **`collect` / `run` / `ingest`** operate on **real data** from the actual target. This is what
+  you use in the CTF.
 
 ```bash
-# 1. See the whole engine on the built-in EVIL CORP scenario
+# A) Let ZeroDayTriage run the tools for you against a live target, then reason:
+dotnet run --project src/ZeroDayTriage.Cli -- collect \
+    --target 10.10.0.5 --domain evilcorp.local \
+    --user jdoe --password 'Passw0rd!' --dc-ip 10.10.0.5 --db eng.db
+dotnet run --project src/ZeroDayTriage.Cli -- triage --db eng.db
+
+# Tools live in WSL/Kali on a Windows box? Prefix every command, and preview first:
+#   ... collect --target 10.10.0.5 --user jdoe --password p --launcher wsl --dry-run
+
+# B) Run ANY tool yourself and pipe the real output in (version/flag agnostic):
+nxc smb 10.10.0.5 -u jdoe -p p | dotnet run --project src/ZeroDayTriage.Cli -- \
+    ingest --stdin --source netexec --db eng.db
+
+# C) Have ZeroDayTriage execute a specific command and normalize its real output:
+dotnet run --project src/ZeroDayTriage.Cli -- run --as certipy --db eng.db -- \
+    certipy find -u jdoe@evilcorp.local -p p -dc-ip 10.10.0.5 -stdout -json
+
+# D) Point it at SharpHound/BloodHound JSON you already collected:
+dotnet run --project src/ZeroDayTriage.Cli -- ingest --input ./bloodhound-output/ --db eng.db
+```
+
+`collect` ships with live runners for **NetExec** and **Certipy**; every other tool (BloodHound,
+Impacket, Slither, Suricata, RITA, malware config extractors) feeds in through `run`, `ingest
+--stdin`, or `ingest --input`. The reasoning, ranking, and shortest-path-to-DA then operate on
+your real findings.
+
+> **Authorized use only.** `collect` and `run` actively execute offensive tooling against the
+> target you name. Run them solely within an authorized engagement, CTF, or lab.
+
+## Usage (offline demo)
+
+```bash
+# See the whole engine on the built-in EVIL CORP SAMPLE scenario (canned data)
 dotnet run --project src/ZeroDayTriage.Cli -- demo
 
 # 2. Ingest a directory of real tool dumps into an engagement database
