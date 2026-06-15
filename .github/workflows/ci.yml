@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [ main, "claude/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore ZeroDayTriage.sln
+
+      - name: Build
+        run: dotnet build ZeroDayTriage.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ZeroDayTriage.sln --configuration Release --no-build --verbosity normal
+
+      - name: Smoke test the CLI
+        run: dotnet run --project src/ZeroDayTriage.Cli --configuration Release --no-build -- demo

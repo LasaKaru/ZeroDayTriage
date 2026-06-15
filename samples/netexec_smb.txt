@@ -1,0 +1,4 @@
+SMB         10.10.0.5    445    DC01    [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:evilcorp.local) (signing:False) (SMBv1:False)
+SMB         10.10.0.5    445    DC01    [+] evilcorp.local\svc_sql:Summer2024!
+SMB         10.10.0.7    445    FS01    [+] evilcorp.local\backupadmin:aad3b435b51404eeaad3b435b51404ee:5f4dcc3b5aa765d61d8327deb882cf99 (Pwn3d!)
+SMB         10.10.0.9    445    WS09    [-] evilcorp.local\jdoe:WrongPassword STATUS_LOGON_FAILURE

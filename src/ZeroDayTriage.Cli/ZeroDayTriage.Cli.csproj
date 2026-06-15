@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ZeroDayTriage.Cli</RootNamespace>
+    <AssemblyName>ztriage</AssemblyName>
+    <ToolCommandName>ztriage</ToolCommandName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZeroDayTriage.Core\ZeroDayTriage.Core.csproj" />
+    <ProjectReference Include="..\ZeroDayTriage.Tools\ZeroDayTriage.Tools.csproj" />
+    <ProjectReference Include="..\ZeroDayTriage.Reasoning\ZeroDayTriage.Reasoning.csproj" />
+    <ProjectReference Include="..\ZeroDayTriage.Storage\ZeroDayTriage.Storage.csproj" />
+  </ItemGroup>
+
+</Project>

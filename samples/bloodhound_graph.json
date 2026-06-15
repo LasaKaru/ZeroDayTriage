@@ -1,0 +1,16 @@
+{
+  "meta": { "type": "computers", "count": 2 },
+  "data": [
+    {
+      "Properties": { "name": "WS01.EVILCORP.LOCAL" },
+      "LocalAdmins": [ { "name": "SVC_SQL@EVILCORP.LOCAL", "ObjectType": "User" } ],
+      "Sessions": { "Results": [ { "UserName": "SVC_ADM@EVILCORP.LOCAL" } ] },
+      "Aces": []
+    },
+    {
+      "Properties": { "name": "DOMAIN ADMINS@EVILCORP.LOCAL", "highvalue": true },
+      "Members": [ { "name": "SVC_ADM@EVILCORP.LOCAL", "ObjectType": "User" } ],
+      "Aces": []
+    }
+  ]
+}
