@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "ztriage (demo)": {
+      "commandName": "Project",
+      "commandLineArgs": "demo"
+    },
+    "ztriage (help)": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "ztriage (ingest samples)": {
+      "commandName": "Project",
+      "commandLineArgs": "ingest --input samples --db engagement.db",
+      "workingDirectory": "..\\.."
+    },
+    "ztriage (triage samples)": {
+      "commandName": "Project",
+      "commandLineArgs": "triage --db engagement.db --format markdown",
+      "workingDirectory": "..\\.."
+    }
+  }
+}

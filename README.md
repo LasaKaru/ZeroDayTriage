@@ -78,6 +78,25 @@ dotnet build
 dotnet test            # 94 tests across 5 suites
 ```
 
+## Running in Visual Studio
+
+This solution has **five class libraries and one executable** (`ZeroDayTriage.Cli`). If you press
+F5 while a library is the startup project, Visual Studio shows:
+
+> *A project with an Output Type of Class Library cannot be started directly.*
+
+That just means VS is pointed at a library. Fix it once:
+
+1. In **Solution Explorer**, right-click **`ZeroDayTriage.Cli`** → **Set as Startup Project**
+   (it will show in **bold**).
+2. Pick a launch profile from the **Run** dropdown in the toolbar — `ztriage (demo)` is a good
+   first run. The bundled profiles are `demo`, `help`, `ingest samples`, and `triage samples`.
+3. Press **F5** (debug) or **Ctrl+F5** (run without debugging).
+
+The libraries (`Core`, `Tools`, `Reasoning`, `Storage`) are meant to be *referenced*, not run —
+only the CLI is an executable. From the command line none of this matters; just target the CLI
+project as shown below.
+
 ## Usage
 
 ```bash
